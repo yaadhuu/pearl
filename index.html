@@ -66,39 +66,61 @@
     }
   }
 
-  /* custom cursor: desktop/mouse only */
+  /* custom cursor: desktop/mouse only — soft pastel ring with a gentle
+     rainbow shimmer */
   .cursor{
     position: fixed;
     top:0; left:0;
-    width: 22px; height: 22px;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    border: 1px solid rgba(26,26,26,0.35);
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(#fff,#fff) padding-box,
+      conic-gradient(from var(--hue,0deg), #f7c6d9, #c9e4f2, #fdf0c0, #d6f0d6, #f7c6d9) border-box;
     pointer-events: none;
     transform: translate(-50%,-50%);
-    transition: width 220ms ease, height 220ms ease, background 220ms ease, border-color 220ms ease;
+    transition: width 220ms ease, height 220ms ease, box-shadow 220ms ease;
+    box-shadow: 0 0 10px rgba(230,190,220,0.35);
     z-index: 9999;
-    mix-blend-mode: multiply;
+    animation: cursorShimmer 5s linear infinite;
   }
+  @keyframes cursorShimmer{ to{ --hue: 360deg; } }
   .cursor.hover{
-    width: 46px; height: 46px;
-    background: rgba(26,26,26,0.06);
-    border-color: rgba(26,26,26,0.5);
+    width: 40px; height: 40px;
+    box-shadow: 0 0 18px rgba(230,190,220,0.5);
+  }
+
+  .sparkle{
+    position: fixed;
+    top:0; left:0;
+    pointer-events: none;
+    z-index: 9998;
+    font-size: 12px;
+    opacity: 0.85;
+    animation: sparkleFloat 800ms ease-out forwards;
+  }
+  @keyframes sparkleFloat{
+    0%{   transform: translate(-50%,-50%) translateY(0) scale(0.6) rotate(0deg); opacity: 0.9; }
+    100%{ transform: translate(-50%,-50%) translateY(-26px) scale(1) rotate(20deg); opacity: 0; }
   }
 
   @media (hover: none){
     body{ cursor: auto; }
-    .cursor{ display: none; }
+    .cursor, .sparkle{ display: none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation: none; }
   }
 
   /* mobile: stack vertically, roomier spacing than the squeeze a wrapped
      row would give */
   @media (max-width: 480px){
-    body{ padding: max(20px, env(safe-area-inset-top,0px)) 20px max(20px, env(safe-area-inset-bottom,0px)); }
+    body{ padding: max(16px, env(safe-area-inset-top,0px)) 16px max(16px, env(safe-area-inset-bottom,0px)); }
     .row{
       flex-direction: column;
-      gap: clamp(28px, 9vh, 56px);
+      gap: clamp(10px, 3vh, 22px);
     }
-    .obj{ width: clamp(140px, 46vw, 220px); }
+    .obj{ width: clamp(120px, 36vw, 180px); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -120,7 +142,7 @@
     </a>
   </div>
 
-  <div id="scrollOverlay" style="position:fixed;inset:0;background:#000;display:none;z-index:1000;">
+  <div id="scrollOverlay" style="position:fixed;inset:0;background:#000;visibility:hidden;opacity:0;pointer-events:none;transition:opacity 200ms ease;z-index:1000;">
     <button id="scrollClose" aria-label="close" style="position:fixed;top:max(12px, env(safe-area-inset-top,0px));right:max(12px, env(safe-area-inset-right,0px));z-index:1001;font-family:system-ui,sans-serif;font-size:20px;line-height:1;color:rgba(243,230,203,0.8);background:rgba(0,0,0,0.4);border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;touch-action:manipulation;">&times;</button>
     <iframe id="scrollFrame" title="our memories" style="width:100%;height:100%;border:0;display:block;"></iframe>
   </div>
@@ -130,11 +152,33 @@
   <script>
     var cursor = document.getElementById('cursor');
     var hasFine = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (hasFine) {
       window.addEventListener('pointermove', function(e){
         if (e.pointerType && e.pointerType !== 'mouse') return;
         cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
       });
+
+      // tiny cute sparkle trail — spawns rarely, drifts up, fades away
+      if (!reducedMotion) {
+        var sparkleGlyphs = ['✦','✧','♡','❀','★'];
+        var sparkleColors = ['#e79fc0','#9fc9e7','#e7c99f','#a8d8a8','#c9a8e0'];
+        var lastSpark = 0;
+        window.addEventListener('pointermove', function(e){
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          var now = performance.now();
+          if (now - lastSpark < 140) return;
+          lastSpark = now;
+          var s = document.createElement('span');
+          s.className = 'sparkle';
+          s.textContent = sparkleGlyphs[Math.floor(Math.random() * sparkleGlyphs.length)];
+          s.style.left = e.clientX + 'px';
+          s.style.top = e.clientY + 'px';
+          s.style.color = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+          document.body.appendChild(s);
+          setTimeout(function(){ s.remove(); }, 850);
+        });
+      }
     }
 
     document.querySelectorAll('.obj').forEach(function(obj){
@@ -170,14 +214,25 @@
     if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 2000 });
     else setTimeout(warm, 800);
 
-    link.addEventListener('click', function(e){
-      e.preventDefault();
+    function openMemories(e){
+      if (e) e.preventDefault();
       warm();
-      overlay.style.display = 'block';
-    });
-    closeBtn.addEventListener('click', function(){
-      overlay.style.display = 'none';
-    });
+      overlay.style.visibility = 'visible';
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'auto';
+      // safety net: force the scroll page to re-measure now that it has
+      // real, visible dimensions (covers browsers that skipped layout
+      // while it was hidden)
+      try { frame.contentWindow && frame.contentWindow.dispatchEvent(new Event('resize')); } catch(err){}
+    }
+    function closeMemories(){
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+      setTimeout(function(){ overlay.style.visibility = 'hidden'; }, 200);
+    }
+    link.addEventListener('click', openMemories);
+    link.addEventListener('touchend', function(e){ e.preventDefault(); openMemories(e); }, {passive:false});
+    closeBtn.addEventListener('click', closeMemories);
   </script>
 </body>
 </html>

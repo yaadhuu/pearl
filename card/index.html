@@ -1099,8 +1099,20 @@
     setTimeout(function(){ playPageTurn(true); }, 100);
     tuckLetter();
   }
-  coverBtn.addEventListener('click', openCard);
-  backBtn.addEventListener('click', closeCard);
+  // iOS Safari can occasionally fail to synthesize 'click' on an element
+  // that has a pending/active 3D transform (the cover's flip) — raw
+  // touchend always fires, so use it as a reliability fallback everywhere
+  // a tap must never feel unresponsive.
+  function addTapListener(el, handler){
+    el.addEventListener('click', handler);
+    el.addEventListener('touchend', function(e){
+      e.preventDefault();
+      handler(e);
+    }, { passive: false });
+  }
+
+  addTapListener(coverBtn, openCard);
+  addTapListener(backBtn, closeCard);
 
   /* ---------------- letter lift ---------------- */
   var pageLeftBg = pageLeft.querySelector('.page-left-bg');
@@ -1122,9 +1134,9 @@
     if (pageLeft.classList.contains('lifted')) tuckLetter();
     else liftLetter();
   }
-  envelopeHit.addEventListener('click', toggleLetter);
-  letterImg.addEventListener('click', function(e){
-    e.stopPropagation();
+  addTapListener(envelopeHit, toggleLetter);
+  addTapListener(letterImg, function(e){
+    if (e.stopPropagation) e.stopPropagation();
     toggleLetter();
   });
 
