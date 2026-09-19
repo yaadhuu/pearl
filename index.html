@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>happy birthday</title>
+<style>
+  :root{
+    --ink: #f3e6cb;
+    --dim: rgba(243,230,203,0.6);
+    --bg1: #1b140f;
+    --bg2: #0e0a07;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(28px, 8vh, 56px);
+    background: radial-gradient(ellipse at 50% 20%, var(--bg1), var(--bg2) 70%);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    padding: 24px;
+    opacity: 0;
+    animation: fadein 280ms ease-out forwards;
+  }
+  @keyframes fadein{ to{ opacity: 1; } }
+
+  h1{
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(15px, 4.5vw, 19px);
+    letter-spacing: 0.28em;
+    text-transform: lowercase;
+    color: var(--dim);
+  }
+
+  .row{
+    display: flex;
+    gap: clamp(10px, 4vw, 48px);
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+  }
+
+  a.icon{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--dim);
+    -webkit-tap-highlight-color: transparent;
+    width: clamp(130px, 32vw, 220px);
+  }
+  .label{ text-align: center; }
+
+  .frame{
+    width: clamp(130px, 32vw, 220px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2a2019, #140f0b);
+    display: grid;
+    place-items: center;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.4),
+      0 14px 26px rgba(0,0,0,0.5);
+    transition: transform 220ms ease, box-shadow 220ms ease;
+  }
+  .frame img{
+    width: 62%;
+    height: 62%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+  }
+
+  a.icon:hover .frame,
+  a.icon:active .frame{
+    transform: translateY(-4px) scale(1.05);
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.45),
+      0 20px 34px rgba(0,0,0,0.55);
+  }
+  a.icon:active .frame{ transform: translateY(-1px) scale(0.98); }
+
+  .label{
+    font-size: clamp(11px, 3vw, 13px);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    body{ animation: none; opacity: 1; }
+    .frame{ transition: none; }
+  }
+</style>
+</head>
+<body>
+  
+  <div class="row">
+    <a class="icon" href="/card">
+      <span class="frame"><img src="icons/envelope.png" alt="envelope"></span>
+      <span class="label">your card</span>
+    </a>
+    <a class="icon" href="https://mixtape-for-you.replit.app/m/ct4i9zee">
+      <span class="frame"><img src="icons/cassette.png" alt="cassette"></span>
+      <span class="label">your mixtape</span>
+    </a>
+    <a class="icon" href="/scroll" id="memoriesLink">
+      <span class="frame"><img src="icons/camera.png" alt="camera"></span>
+      <span class="label">our memories</span>
+    </a>
+  </div>
+
+  <div id="scrollOverlay" style="position:fixed;inset:0;background:#000;display:none;z-index:1000;">
+    <button id="scrollClose" aria-label="close" style="position:fixed;top:12px;right:12px;z-index:1001;font-family:system-ui,sans-serif;font-size:20px;line-height:1;color:rgba(243,230,203,0.8);background:rgba(0,0,0,0.4);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;">&times;</button>
+    <iframe id="scrollFrame" title="our memories" style="width:100%;height:100%;border:0;display:block;"></iframe>
+  </div>
+
+  <script>
+    var link = document.getElementById('memoriesLink');
+    var overlay = document.getElementById('scrollOverlay');
+    var frame = document.getElementById('scrollFrame');
+    var closeBtn = document.getElementById('scrollClose');
+
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      frame.src = '/scroll';
+      overlay.style.display = 'block';
+    });
+    closeBtn.addEventListener('click', function(){
+      overlay.style.display = 'none';
+      frame.src = '';
+    });
+  </script>
+</body>
+</html>
