@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>happy birthday</title>
 <link rel="prefetch" href="/card" as="document">
 <link rel="prefetch" href="/scroll" as="document">
 <style>
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; height:100%; }
+  html,body{ margin:0; padding:0; height:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
   body{
     min-height: 100dvh;
     display: flex;
@@ -19,15 +19,21 @@
     cursor: none;
     opacity: 0;
     animation: fadein 300ms ease-out forwards;
+    padding:
+      max(24px, env(safe-area-inset-top, 0px))
+      max(24px, env(safe-area-inset-right, 0px))
+      max(24px, env(safe-area-inset-bottom, 0px))
+      max(24px, env(safe-area-inset-left, 0px));
   }
   @keyframes fadein{ to{ opacity: 1; } }
+
+  img{ -webkit-user-drag:none; -webkit-touch-callout:none; user-select:none; -webkit-user-select:none; }
 
   .row{
     display: flex;
     align-items: center;
     justify-content: center;
     gap: clamp(24px, 8vw, 100px);
-    padding: 24px;
     max-width: 100%;
   }
 
@@ -36,6 +42,7 @@
     width: clamp(120px, 25vw, 250px);
     perspective: 700px;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .obj img{
     width: 100%;
@@ -51,8 +58,15 @@
     transform: translateY(-10px) scale(1.06) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
     filter: drop-shadow(0 22px 32px rgba(0,0,0,0.14)) drop-shadow(0 4px 8px rgba(0,0,0,0.10));
   }
+  /* touch devices: no hover, use a simple press-down instead of the cursor-driven tilt */
+  @media (hover: none){
+    .obj:active img{
+      transform: translateY(-4px) scale(0.97);
+      filter: drop-shadow(0 12px 20px rgba(0,0,0,0.14)) drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+    }
+  }
 
-  /* custom cursor */
+  /* custom cursor: desktop/mouse only */
   .cursor{
     position: fixed;
     top:0; left:0;
@@ -75,6 +89,18 @@
     body{ cursor: auto; }
     .cursor{ display: none; }
   }
+
+  /* mobile: stack vertically, roomier spacing than the squeeze a wrapped
+     row would give */
+  @media (max-width: 480px){
+    body{ padding: max(20px, env(safe-area-inset-top,0px)) 20px max(20px, env(safe-area-inset-bottom,0px)); }
+    .row{
+      flex-direction: column;
+      gap: clamp(28px, 9vh, 56px);
+    }
+    .obj{ width: clamp(140px, 46vw, 220px); }
+  }
+
   @media (prefers-reduced-motion: reduce){
     body{ animation: none; opacity: 1; }
     .obj img{ transition: none; }
@@ -84,18 +110,18 @@
 <body>
   <div class="row">
     <a class="obj" href="/card" aria-label="your card">
-      <img src="icons/envelope.png" alt="">
+      <img src="icons/envelope.png" alt="" draggable="false">
     </a>
     <a class="obj" href="https://mixtape-for-you.replit.app/m/ct4i9zee" aria-label="your mixtape">
-      <img src="icons/cassette.png" alt="">
+      <img src="icons/cassette.png" alt="" draggable="false">
     </a>
     <a class="obj" href="/scroll" id="memoriesLink" aria-label="our memories">
-      <img src="icons/camera.png" alt="">
+      <img src="icons/camera.png" alt="" draggable="false">
     </a>
   </div>
 
   <div id="scrollOverlay" style="position:fixed;inset:0;background:#000;display:none;z-index:1000;">
-    <button id="scrollClose" aria-label="close" style="position:fixed;top:12px;right:12px;z-index:1001;font-family:system-ui,sans-serif;font-size:20px;line-height:1;color:rgba(243,230,203,0.8);background:rgba(0,0,0,0.4);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;">&times;</button>
+    <button id="scrollClose" aria-label="close" style="position:fixed;top:max(12px, env(safe-area-inset-top,0px));right:max(12px, env(safe-area-inset-right,0px));z-index:1001;font-family:system-ui,sans-serif;font-size:20px;line-height:1;color:rgba(243,230,203,0.8);background:rgba(0,0,0,0.4);border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;touch-action:manipulation;">&times;</button>
     <iframe id="scrollFrame" title="our memories" style="width:100%;height:100%;border:0;display:block;"></iframe>
   </div>
 
@@ -106,19 +132,25 @@
     var hasFine = window.matchMedia && window.matchMedia('(hover: hover)').matches;
     if (hasFine) {
       window.addEventListener('pointermove', function(e){
+        if (e.pointerType && e.pointerType !== 'mouse') return;
         cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
       });
     }
 
     document.querySelectorAll('.obj').forEach(function(obj){
       var img = obj.querySelector('img');
-      obj.addEventListener('pointerenter', function(){ cursor.classList.add('hover'); });
-      obj.addEventListener('pointerleave', function(){
+      obj.addEventListener('pointerenter', function(e){
+        if (e.pointerType && e.pointerType !== 'mouse') return;
+        cursor.classList.add('hover');
+      });
+      obj.addEventListener('pointerleave', function(e){
+        if (e.pointerType && e.pointerType !== 'mouse') return;
         cursor.classList.remove('hover');
         img.style.setProperty('--rx', '0deg');
         img.style.setProperty('--ry', '0deg');
       });
       obj.addEventListener('pointermove', function(e){
+        if (e.pointerType && e.pointerType !== 'mouse') return;
         var r = obj.getBoundingClientRect();
         var nx = (e.clientX - r.left) / r.width - 0.5;
         var ny = (e.clientY - r.top) / r.height - 0.5;
