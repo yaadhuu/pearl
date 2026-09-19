@@ -53,12 +53,16 @@
     filter: drop-shadow(0 10px 18px rgba(0,0,0,0.10)) drop-shadow(0 2px 4px rgba(0,0,0,0.08));
     will-change: transform;
   }
-  .obj:hover img,
-  .obj.active img{
-    transform: translateY(-10px) scale(1.06) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
-    filter: drop-shadow(0 22px 32px rgba(0,0,0,0.14)) drop-shadow(0 4px 8px rgba(0,0,0,0.10));
+  /* hover-driven lift only on devices that actually have real hover —
+     on touch, a tap can set :hover with no matching leave event, which
+     left icons (camera especially, after returning from the overlay)
+     stuck in the lifted state */
+  @media (hover: hover){
+    .obj:hover img{
+      transform: translateY(-10px) scale(1.06) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+      filter: drop-shadow(0 22px 32px rgba(0,0,0,0.14)) drop-shadow(0 4px 8px rgba(0,0,0,0.10));
+    }
   }
-  /* touch devices: no hover, use a simple press-down instead of the cursor-driven tilt */
   @media (hover: none){
     .obj:active img{
       transform: translateY(-4px) scale(0.97);
