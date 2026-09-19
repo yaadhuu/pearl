@@ -71,23 +71,21 @@
   .cursor{
     position: fixed;
     top:0; left:0;
-    width: 20px; height: 20px;
+    width: 14px; height: 14px;
     border-radius: 50%;
-    border: 1.5px solid transparent;
-    background:
-      linear-gradient(#fff,#fff) padding-box,
-      conic-gradient(from var(--hue,0deg), #f7c6d9, #c9e4f2, #fdf0c0, #d6f0d6, #f7c6d9) border-box;
+    border: 1.5px solid hsl(var(--hue,330), 70%, 80%);
+    background: transparent;
     pointer-events: none;
     transform: translate(-50%,-50%);
     transition: width 220ms ease, height 220ms ease, box-shadow 220ms ease;
-    box-shadow: 0 0 10px rgba(230,190,220,0.35);
+    box-shadow: 0 0 6px rgba(230,190,220,0.3);
     z-index: 9999;
     animation: cursorShimmer 5s linear infinite;
   }
-  @keyframes cursorShimmer{ to{ --hue: 360deg; } }
+  @keyframes cursorShimmer{ to{ --hue: 690; } }
   .cursor.hover{
-    width: 40px; height: 40px;
-    box-shadow: 0 0 18px rgba(230,190,220,0.5);
+    width: 24px; height: 24px;
+    box-shadow: 0 0 10px rgba(230,190,220,0.4);
   }
 
   .sparkle{
