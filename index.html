@@ -222,6 +222,11 @@
       overlay.style.visibility = 'visible';
       overlay.style.opacity = '1';
       overlay.style.pointerEvents = 'auto';
+      // the fake cursor dot is fixed to the TOP document and keeps
+      // painting above the iframe even after it stops tracking the real
+      // pointer (no mousemove bubbles out of a cross-document iframe) —
+      // hide it for as long as the overlay is up
+      cursor.style.display = 'none';
       // safety net: force the scroll page to re-measure now that it has
       // real, visible dimensions (covers browsers that skipped layout
       // while it was hidden)
@@ -230,6 +235,7 @@
     function closeMemories(){
       overlay.style.opacity = '0';
       overlay.style.pointerEvents = 'none';
+      cursor.style.display = '';
       setTimeout(function(){ overlay.style.visibility = 'hidden'; }, 200);
     }
     link.addEventListener('click', openMemories);
