@@ -4,115 +4,93 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>happy birthday</title>
+<link rel="prefetch" href="/card" as="document">
+<link rel="prefetch" href="/scroll" as="document">
 <style>
-  :root{
-    --ink: #f3e6cb;
-    --dim: rgba(243,230,203,0.6);
-    --bg1: #1b140f;
-    --bg2: #0e0a07;
-  }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; height:100%; }
   body{
     min-height: 100dvh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(28px, 8vh, 56px);
-    background: radial-gradient(ellipse at 50% 20%, var(--bg1), var(--bg2) 70%);
-    color: var(--ink);
-    font-family: Georgia, 'Times New Roman', serif;
-    padding: 24px;
+    background: #faf8f4;
+    background-image: radial-gradient(ellipse at 50% 40%, #ffffff, #f3efe7 120%);
+    cursor: none;
     opacity: 0;
-    animation: fadein 280ms ease-out forwards;
+    animation: fadein 300ms ease-out forwards;
   }
   @keyframes fadein{ to{ opacity: 1; } }
 
-  h1{
-    margin: 0;
-    font-weight: 400;
-    font-size: clamp(15px, 4.5vw, 19px);
-    letter-spacing: 0.28em;
-    text-transform: lowercase;
-    color: var(--dim);
-  }
-
   .row{
     display: flex;
-    gap: clamp(10px, 4vw, 48px);
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
+    gap: clamp(24px, 8vw, 100px);
+    padding: 24px;
     max-width: 100%;
   }
 
-  a.icon{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: var(--dim);
-    -webkit-tap-highlight-color: transparent;
-    width: clamp(130px, 32vw, 220px);
-  }
-  .label{ text-align: center; }
-
-  .frame{
-    width: clamp(130px, 32vw, 220px);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2a2019, #140f0b);
-    display: grid;
-    place-items: center;
-    box-shadow:
-      0 2px 4px rgba(0,0,0,0.4),
-      0 14px 26px rgba(0,0,0,0.5);
-    transition: transform 220ms ease, box-shadow 220ms ease;
-  }
-  .frame img{
-    width: 62%;
-    height: 62%;
-    object-fit: contain;
+  .obj{
     display: block;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+    width: clamp(120px, 25vw, 250px);
+    perspective: 700px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .obj img{
+    width: 100%;
+    height: auto;
+    display: block;
+    transform: translateY(0) scale(1) rotateX(0) rotateY(0);
+    transition: transform 320ms cubic-bezier(.22,.61,.36,1), filter 320ms ease;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.10)) drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+    will-change: transform;
+  }
+  .obj:hover img,
+  .obj.active img{
+    transform: translateY(-10px) scale(1.06) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+    filter: drop-shadow(0 22px 32px rgba(0,0,0,0.14)) drop-shadow(0 4px 8px rgba(0,0,0,0.10));
   }
 
-  a.icon:hover .frame,
-  a.icon:active .frame{
-    transform: translateY(-4px) scale(1.05);
-    box-shadow:
-      0 4px 8px rgba(0,0,0,0.45),
-      0 20px 34px rgba(0,0,0,0.55);
+  /* custom cursor */
+  .cursor{
+    position: fixed;
+    top:0; left:0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(26,26,26,0.35);
+    pointer-events: none;
+    transform: translate(-50%,-50%);
+    transition: width 220ms ease, height 220ms ease, background 220ms ease, border-color 220ms ease;
+    z-index: 9999;
+    mix-blend-mode: multiply;
   }
-  a.icon:active .frame{ transform: translateY(-1px) scale(0.98); }
-
-  .label{
-    font-size: clamp(11px, 3vw, 13px);
-    letter-spacing: 0.04em;
-    font-style: italic;
+  .cursor.hover{
+    width: 46px; height: 46px;
+    background: rgba(26,26,26,0.06);
+    border-color: rgba(26,26,26,0.5);
   }
 
+  @media (hover: none){
+    body{ cursor: auto; }
+    .cursor{ display: none; }
+  }
   @media (prefers-reduced-motion: reduce){
     body{ animation: none; opacity: 1; }
-    .frame{ transition: none; }
+    .obj img{ transition: none; }
   }
 </style>
 </head>
 <body>
-  
   <div class="row">
-    <a class="icon" href="/card">
-      <span class="frame"><img src="icons/envelope.png" alt="envelope"></span>
-      <span class="label">your card</span>
+    <a class="obj" href="/card" aria-label="your card">
+      <img src="icons/envelope.png" alt="">
     </a>
-    <a class="icon" href="https://mixtape-for-you.replit.app/m/ct4i9zee">
-      <span class="frame"><img src="icons/cassette.png" alt="cassette"></span>
-      <span class="label">your mixtape</span>
+    <a class="obj" href="https://mixtape-for-you.replit.app/m/ct4i9zee" aria-label="your mixtape">
+      <img src="icons/cassette.png" alt="">
     </a>
-    <a class="icon" href="/scroll" id="memoriesLink">
-      <span class="frame"><img src="icons/camera.png" alt="camera"></span>
-      <span class="label">our memories</span>
+    <a class="obj" href="/scroll" id="memoriesLink" aria-label="our memories">
+      <img src="icons/camera.png" alt="">
     </a>
   </div>
 
@@ -121,20 +99,52 @@
     <iframe id="scrollFrame" title="our memories" style="width:100%;height:100%;border:0;display:block;"></iframe>
   </div>
 
+  <div class="cursor" id="cursor"></div>
+
   <script>
+    var cursor = document.getElementById('cursor');
+    var hasFine = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+    if (hasFine) {
+      window.addEventListener('pointermove', function(e){
+        cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
+      });
+    }
+
+    document.querySelectorAll('.obj').forEach(function(obj){
+      var img = obj.querySelector('img');
+      obj.addEventListener('pointerenter', function(){ cursor.classList.add('hover'); });
+      obj.addEventListener('pointerleave', function(){
+        cursor.classList.remove('hover');
+        img.style.setProperty('--rx', '0deg');
+        img.style.setProperty('--ry', '0deg');
+      });
+      obj.addEventListener('pointermove', function(e){
+        var r = obj.getBoundingClientRect();
+        var nx = (e.clientX - r.left) / r.width - 0.5;
+        var ny = (e.clientY - r.top) / r.height - 0.5;
+        img.style.setProperty('--ry', (nx * 14).toFixed(2) + 'deg');
+        img.style.setProperty('--rx', (-ny * 14).toFixed(2) + 'deg');
+      });
+    });
+
     var link = document.getElementById('memoriesLink');
     var overlay = document.getElementById('scrollOverlay');
     var frame = document.getElementById('scrollFrame');
     var closeBtn = document.getElementById('scrollClose');
 
+    // load the scroll page + its images in the background while the user
+    // is still looking at the landing icons, so tapping camera is instant
+    var warm = function(){ if (!frame.src) frame.src = '/scroll'; };
+    if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 2000 });
+    else setTimeout(warm, 800);
+
     link.addEventListener('click', function(e){
       e.preventDefault();
-      frame.src = '/scroll';
+      warm();
       overlay.style.display = 'block';
     });
     closeBtn.addEventListener('click', function(){
       overlay.style.display = 'none';
-      frame.src = '';
     });
   </script>
 </body>
